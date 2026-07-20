@@ -23,12 +23,14 @@ load_dotenv(BASE_DIR / '.env')
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_GOOGLE_KEY = os.getenv('SECRET_GOOGLE_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
 
+VERSION = os.getenv('VERSION')
 
 # Application definition
 
@@ -42,6 +44,7 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'django_filters',
+    'drf-spectacular',
     
     'comments',
 ]
@@ -132,4 +135,23 @@ DATABASES = {
         "HOST": os.getenv('DB_HOST'),
         "PORT": os.getenv('DB_PORT'),
     }
+}
+
+# DRF settings
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 50
+}
+
+# ReCaptcha settings
+RECAPTCHA_PUBLIC_KEY = os.getenv('RECAPTCHA_PUBLIC_KEY')
+RECAPTCHA_PRIVATE_KEY = os.getenv('RECAPTCHA_PRIVATE_KEY')
+
+# Swagger settings
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'SPA Comments API',
+    'DESCRIPTION': 'API for the tree comments system with deep validation and clean up.',
+    'VERSION': VERSION,
+    'SERVE_INCLUDE_SCHEMA': False,
 }
