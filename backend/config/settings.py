@@ -44,7 +44,7 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'django_filters',
-    'drf-spectacular',
+    'drf_spectacular',
     
     'comments',
 ]
@@ -141,7 +141,7 @@ DATABASES = {
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 50
+    'PAGE_SIZE': 25
 }
 
 # ReCaptcha settings
@@ -155,3 +155,13 @@ SPECTACULAR_SETTINGS = {
     'VERSION': VERSION,
     'SERVE_INCLUDE_SCHEMA': False,
 }
+
+import sys
+
+if 'test' in sys.argv:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': ':memory:',
+        }
+    }

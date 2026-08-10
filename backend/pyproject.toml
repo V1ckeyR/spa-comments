@@ -21,4 +21,5 @@ dependencies = [
     "psycopg[binary]>=3.3.4",
     "python-dotenv>=1.2.2",
     "redis>=8.0.1",
+    "requests>=2.32.0",
 ]

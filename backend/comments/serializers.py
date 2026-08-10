@@ -1,23 +1,26 @@
 import requests
 
 import bleach
+from django.conf import settings
 from rest_framework import serializers
 from django.core.validators import RegexValidator
 
 from .models import Comment, Attachment, Reaction, User
-from backend.config.settings import SECRET_GOOGLE_KEY
 
 
 class UserSerializer(serializers.ModelSerializer):
     username = serializers.CharField(
         validators=[RegexValidator(
-            regex=r'^[a-zA-Z0-9]+$',
+            regex=r'^[a-zA-Z0-9_]+$',
             message='Username can only contain alphanumeric characters.')
         ])
 
     class Meta:
         model = User
         exclude = ['created_at', 'updated_at']
+        extra_kwargs = {
+            'email': {'validators': []},
+        }
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -25,20 +28,26 @@ class CommentSerializer(serializers.ModelSerializer):
     captcha_token = serializers.CharField(write_only=True)
 
     def create(self, validated_data):
-        user_data = validated_data.get('user')
+        validated_data.pop('captcha_token', None)
+        user_data = validated_data.pop('user')
         user, _ = User.objects.get_or_create(**user_data)
         validated_data['user'] = user
         return super().create(validated_data)
 
     def validate_content(self, value):
         allowed_tags = ['a', 'code', 'i', 'strong']
-        return bleach.clean(value, tags=allowed_tags)
+        cleaned_value = bleach.clean(value, tags=allowed_tags, strip=True).strip()
+        if not cleaned_value:
+            raise serializers.ValidationError('Comment content cannot be empty')
+
+        return  cleaned_value
 
     def validate_captcha_token(self, value):
-        response = requests.post('https://www.google.com/recaptcha/api/siteverify', data={'secret': SECRET_GOOGLE_KEY, 'response': value})
+        response = requests.post('https://www.google.com/recaptcha/api/siteverify', data={'secret': settings.SECRET_GOOGLE_KEY, 'response': value})
         results = response.json()
         if response.ok and results.get('success'):  # TODO: check the results.get('hostname') once actual hostname set up
             return value
+
         raise serializers.ValidationError('Invalid captcha token.')
 
     class Meta:
