@@ -216,3 +216,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# SQL workbanch 8.0 CE
+*.mwb.bak
