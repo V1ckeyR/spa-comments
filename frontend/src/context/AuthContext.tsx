@@ -23,10 +23,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setToken(access);
     };
 
-    const logout = () => {
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
-        setToken(null);
+    const logout = async () => {
+        const refreshToken = localStorage.getItem('refresh_token');
+        try {
+            if (refreshToken) {
+                await api.post('/api/logout/', { refresh: refreshToken });
+            } 
+        } catch {
+            // Nothing
+        } finally {
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
+            setToken(null);
+        }
     };
 
     return (
