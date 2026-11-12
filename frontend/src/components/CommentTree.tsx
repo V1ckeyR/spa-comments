@@ -86,7 +86,7 @@ export const CommentTree: React.FC = () => {
     const [comments] = useState<Comment[]>(MOCK_COMMENTS);
 
     return (
-        <div>
+        <div style={{ margin: '2rem' }}>
             {comments.map((comment: Comment) => (
                 <CommentItem key={comment.id} comment={comment} />
             ))}
